@@ -1,17 +1,13 @@
 import styles from "./styles.module.css";
+import NodeWithArrows from "./nodeWithArrows";
 
 export default function Tree(props) {
-  let root = [
-    [10],
-    [12, 20],
-    [14, 18, 22, 16],
-    [14, 18, 22, 16, 21, 12, 1, 2],
-    [14, 18, 22, 16, 21, 12, 1, 2, 14, 18, 22, 16, 21, 12, 1, 2],
-  ];
-  let n = root.length;
-  let oneBoxSize = 100;
-  let nodeRadius = 0.3;
-  let width = `${oneBoxSize * Math.pow(2, n - 1)}px`;
+  let levelOrderArray = props.levelOrderArray;
+  let n = levelOrderArray.length;
+
+  let oneBoxSize = 100; // size of one node element including margins.
+  let nodeRadius = 0.3; //radius of node element circle.
+  let width = `${oneBoxSize * Math.pow(2, n - 1)}px`; // width of the last level of tree
 
   const geomatryCalculations = (index) => {
     let verticalGap = 1; // in terms of boxes.
@@ -19,108 +15,48 @@ export default function Tree(props) {
     if (index >= n - 2) {
       horizontalGap = 1 / 2;
     } else {
-      horizontalGap = Math.pow(2, n - 3 - index);
+      horizontalGap = Math.pow(2, n - 3 - index); // refer redme file for the formulas.
     }
+
     let angle = Math.atan(horizontalGap / verticalGap);
-
-    let size =
-      Math.pow(horizontalGap * horizontalGap + verticalGap * verticalGap, 0.5) -
-      2 * nodeRadius;
-    let bottom = verticalGap / 2;
-    let left = horizontalGap / 4;
-
     let height = 1 - 2 * nodeRadius * Math.cos(angle);
     horizontalGap = horizontalGap - 2 * nodeRadius * Math.sin(angle);
-    let t = horizontalGap - 0.2 - (nodeRadius - nodeRadius * Math.sin(angle));
-    t *= oneBoxSize;
-    horizontalGap *= oneBoxSize;
 
-    height *= oneBoxSize;
-    size *= oneBoxSize;
-    bottom *= oneBoxSize;
-    left *= oneBoxSize;
-    angle = (angle * 180) / 3.14;
-
+    let leftRightDisplacement =
+      horizontalGap - 0.2 - (nodeRadius - nodeRadius * Math.sin(angle));
     let arrowLen = Math.pow(
       horizontalGap * horizontalGap + height * height,
       0.5
     );
 
-    return { horizontalGap, angle, size, left, bottom, height, t, arrowLen };
+    leftRightDisplacement *= oneBoxSize;
+    horizontalGap *= oneBoxSize;
+    arrowLen *= oneBoxSize;
+    height *= oneBoxSize;
+    angle = (angle * 180) / 3.14;
+
+    let calculationObj = {
+      horizontalGap,
+      angle,
+      height,
+      leftRightDisplacement,
+      arrowLen,
+    };
+
+    return calculationObj;
   };
   const printArr = (ele, i) => {
-    let { horizontalGap, angle, size, left, bottom, height, t, arrowLen } =
-      geomatryCalculations(i);
+    let calculationObj = geomatryCalculations(i);
 
     let res = [];
     for (let x of ele) {
       res.push(
-        <div
-          style={{
-            height: "100px",
-            width: "100px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "relative",
-          }}
-        >
-          {i != n - 1 && (
-            <div
-              style={{
-                position: "absolute",
-                width: horizontalGap,
-                height: height,
-                bottom: (-1 / 2) * height,
-                left: -1 * t,
-              }}
-            >
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <div
-                  className={styles.line}
-                  style={{
-                    width: `${arrowLen}px`,
-                    transform: `rotate(-${90 - angle}deg)`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          )}
-          <div className={styles.rowEle}>{x}</div>
-          {i != n - 1 && (
-            <div
-              style={{
-                position: "absolute",
-                width: horizontalGap,
-                height: height,
-                bottom: (-1 / 2) * height,
-                right: -1 * t,
-              }}
-            >
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                <div
-                  className={styles.lineRight}
-                  style={{
-                    width: `${arrowLen}px`,
-                    transform: `rotate(${90 - angle}deg)`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          )}
-        </div>
+        <NodeWithArrows
+          currentIndex={i}
+          calculationObj={calculationObj}
+          nodeValue={x}
+          n={n}
+        ></NodeWithArrows>
       );
     }
     return res;
@@ -142,5 +78,5 @@ export default function Tree(props) {
     }
     return res;
   };
-  return <div className={styles.dashboard}>{print2DArr(root)}</div>;
+  return <div className={styles.dashboard}>{print2DArr(levelOrderArray)}</div>;
 }

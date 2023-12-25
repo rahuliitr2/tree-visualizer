@@ -16,10 +16,18 @@ export default function Page() {
     value: 10,
   };
 
+  let levelOrderArray = [
+    [10],
+    [12, 20],
+    [14, 18, 22, 16],
+    [14, 18, 22, 16, 21, 12, 1, 2],
+    [14, 18, 22, 16, 21, 12, 1, 2, 14, 18, 22, 16, 21, 12, 1, 2],
+  ];
+
   return (
     <>
       <h1>Tree</h1>
-      <Tree root={root}></Tree>
+      <Tree levelOrderArray={levelOrderArray}></Tree>
     </>
   );
 }

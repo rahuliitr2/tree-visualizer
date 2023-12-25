@@ -47,6 +47,15 @@
   right: 0;
 }
 .box {
-  box-sizing: border-box;
-  overflow: hidden;
+  height: 100px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.boxForArrow {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
